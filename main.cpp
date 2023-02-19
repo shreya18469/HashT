@@ -16,22 +16,87 @@ struct Student {
   int id;
   float gpa;
   Student* next;
-};
+ };
 void addStu(Student* htable[], int &curID);
 void dlt(Student* htable[]);
 void print(Student* htable[], int size);
 void printChain(Student* current);
 void reset(Student* htable[], int size);
+Student** rehash(Student* htable[], Student* ntable[], int &size, int curID);
 
-void addStu(Student* htable[], int &curID){
-  Student* newPoint = new Student();
-  strcpy(newPoint->firstName, "S");
-  strcpy(newPoint->lastName, "R");
+void addStu(Student* htable[], int &curID, int size){
+  int students;
+  cout << "How many students are you adding?" << endl;
+  cin >> students;
+  for(int i = 0; i < students; i++){
+    char input[100];
+    char firstName[100];
+    char lastName[100];
+    fstream ffile("firstName.txt");
+    fstream lfile("lastName.txt");
+    int count;
+    int num = (rand() % 20) + 1;
+    int num2 = (rand() % 20) + 1;
+    Student* newPoint = new Student();
+    count = 1;
+    while (ffile.getline(input,100, '\n')) {
+      if (count == num) {
+	strcpy(firstName,input);
+	count++;
+      }
+    count++;
+  }
+  ffile.close();
+  count = 1;
+  while (lfile.getline(input,100, '\n')) {
+    if (count == num2) {
+      strcpy(lastName,input);
+      count++;
+    }
+    count++;
+  }
+  lfile.close();
+  float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  r *= 23;
+  while(r > 4){
+    r -= 4;
+    while(r < 2){
+      r += 1;
+    }
+  }
+  strcpy(newPoint->firstName, firstName);
+  strcpy(newPoint->lastName, lastName);
   newPoint->id = curID;
-  newPoint->gpa = 4.12;
-  htable[(curID%100)] = newPoint;
+  newPoint->gpa = r;
+  if(htable[(curID)%size] == NULL){
+    htable[(curID%size)] = newPoint;
+  }
+  else{
+    if(htable[(curID)%size]->next == NULL){
+      htable[curID%size]->next = newPoint;
+    }
+    else{
+      if(htable[(curID)%size]->next->next == NULL){
+	htable[curID%size]->next->next = newPoint;
+      }
+      else{
+	Student* new_table[size*2];
+	reset(new_table, size*2);
+	htable = rehash(htable, new_table, size, curID);
+	cout << endl << endl << endl << endl << endl;
+	htable[curID%size]->next = newPoint;
+	print(htable, size);
+      }
+    }
+  }
   curID++;
-  return;
+}
+
+return;
+}
+Student** rehash(Student* htable[], Student* ntable[], int &size, int curID){
+
+  return ntable;
 }
 void print(Student* htable[], int size){
   for(int i = 0; i < size; i++){
@@ -69,11 +134,10 @@ int main(){
     input[i] =  toupper(input[i]);
   }
   if (strcmp(input, "ADD") == 0){
-    addStu(htable, curID);
+    addStu(htable, curID, size);
   } else if (strcmp(input, "DELETE") == 0){
 
   } else if (strcmp(input, "PRINT") == 0){
-    cout << sizeof(htable) << endl;
     print(htable, size);
   } else if(strcmp(input, "QUIT") == 0) {
     running = false;
