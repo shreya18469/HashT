@@ -1,4 +1,4 @@
-/*
+/*A
 Shreya Suresh
 2/19/23
  */
@@ -17,14 +17,17 @@ struct Student {
   float gpa;
   Student* next;
  };
-void addStu(Student* htable[], int &curID);
-void dlt(Student* htable[]);
-void print(Student* htable[], int size);
+
+void dlt(Student** htable, int size);
+void printAll(Student** htable, int size);
 void printChain(Student* current);
 void reset(Student* htable[], int size);
-Student** rehash(Student* htable[], Student* ntable[], int &size, int curID);
+Student** addStu(Student** htable, int &curID, int &size);
+Student** mAdd(Student** htable, int &curID, int &size);
+Student** rehash(Student** htable, Student** ntable, int &size, int curID);
 
-void addStu(Student* htable[], int &curID, int size){
+
+Student** addStu(Student** htable, int &curID, int &size) {  
   int students;
   cout << "How many students are you adding?" << endl;
   cin >> students;
@@ -80,21 +83,59 @@ void addStu(Student* htable[], int &curID, int size){
 	htable[curID%size]->next->next = newPoint;
       }
       else{
-	Student* new_table[size*2];
+	Student** new_table = new Student*[size*2];
 	reset(new_table, size*2);
 	htable = rehash(htable, new_table, size, curID);
-	cout << endl << endl << endl << endl << endl;
 	htable[curID%size]->next = newPoint;
-	print(htable, size);
       }
     }
   }
   curID++;
 }
 
-return;
+return htable;
 }
-Student** rehash(Student* htable[], Student* ntable[], int &size, int curID){
+Student** mAdd(Student** htable, int &curID, int &size){
+  char input[100];
+  char firstName[100];
+  char lastName[100];
+  float gpa;
+  Student* newP = new Student();
+  cout << "What is their first name?" << endl;
+  cin >> firstName;
+  cin.clear();
+  cout << "What is their last name?" << endl;
+  cin >> lastName;
+  cin.clear();
+  cout << "What is their GPA?" << endl;
+  cin >> gpa;
+  cin.clear();
+
+  strcpy(newP->firstName, firstName);
+  strcpy(newP->lastName, lastName);
+  newP->id = curID;
+  newP->gpa = gpa;
+  if (htable[(curID)%size] == NULL){
+    htable[(curID%size)] = newP;
+  }else {
+    if (htable[(curID)%size]->next == NULL){
+      htable[(curID%size)]->next = newP;
+  }else {
+    if (htable[(curID)%size]->next->next == NULL){
+      htable[curID%size]->next->next = newP;
+  }
+    else { //if there are three collisions, create a new table
+     Student** ntable = new Student*[size*2];
+     reset(ntable, size*2);
+     htable = rehash(htable, ntable, size, curID);
+     htable[curID%size]->next = newP;
+   }
+  }
+}
+   curID++;
+   return htable;
+}
+Student** rehash(Student** htable, Student** ntable, int &size, int curID){
   int size1 = size;
   size = size*2;
   for(int i = 0; i < curID; i++){ 
@@ -107,54 +148,58 @@ Student** rehash(Student* htable[], Student* ntable[], int &size, int curID){
     else{
       ntable[i%size]->next = htable[(i)%size1]->next->next;
     }
-    if(i > size1){
-      ntable[(i%size)]->next = NULL;
-    }
   }
-  print(ntable, size);
+  for (int i = size/2; i < size; i++){
+    ntable[(i%size)]->next = NULL;
+  }
   return ntable;
 }
-void print(Student* htable[], int size){
-  for(int i = 0; i < size; i++){
+
+void printAll(Student** htable, int size){
+  for (int i = 0; i < size; i++){
     printChain(htable[i]);
   }
   return;
 }
 void printChain(Student* current){
   if(current != NULL){
-    cout << current->firstName << " " << current->lastName << " GPA: " << fixed << setprecision(2) << current->gpa << " " << current->id << endl;
+    cout << current->firstName << " " << current->lastName << " GPA: " << fixed << setprecision(2) << current->gpa << " " << "ID: " << current->id << endl;
     printChain(current->next);
   }
   return;
 }
-void dlt(Student* htable[]){
-
+void dlt(Student** htable, int size){
+  int i;
+  cout << "What is the student's ID?" << endl;
+  
 }
-void reset(Student* htable[], int size){
+void reset(Student** htable, int size){
   for(int i = 0; i < size; i++){
     htable[i] = NULL;
   }
 }
 int main(){
+  srand(time(0));
   bool running = true;
-  Student* htable[100];
+  Student** htable = new Student*[100];
   char input[10];
   int curID = 0;
-  int size = sizeof(htable)/sizeof(htable[0]);
+  int size = 100;
   reset(htable, size);
-
-  while(running == true){ // check user input                                                                                                            
-  cout << "Enter a command(ADD, DELETE, PRINT, or QUIT)" << endl;
-  cin.getline(input, 10);
-  for (int i = 0; i < 10; i++){ // convert input to uppercase                                                                                            
+  while(running == true){                                                                                                           
+  cout << "Enter a command(ADD, MADD, DELETE, PRINT, or QUIT)" << endl;
+  cin >> input;
+  for (int i = 0; i < 10; i++){ // convert input to uppercase                                                                                   
     input[i] =  toupper(input[i]);
   }
   if (strcmp(input, "ADD") == 0){
-    addStu(htable, curID, size);
-  } else if (strcmp(input, "DELETE") == 0){
-    dlt(htable);
+    htable = addStu(htable, curID, size);
+  } else if (strcmp(input, "MADD") == 0){
+    htable = mAdd(htable, curID, size);
+    }else if (strcmp(input, "DELETE") == 0){
+    dlt(htable, size);
   } else if (strcmp(input, "PRINT") == 0){
-    print(htable, size);
+    printAll(htable, size);
   } else if(strcmp(input, "QUIT") == 0) {
     running = false;
   }else {
