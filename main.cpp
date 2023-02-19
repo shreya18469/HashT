@@ -95,7 +95,23 @@ void addStu(Student* htable[], int &curID, int size){
 return;
 }
 Student** rehash(Student* htable[], Student* ntable[], int &size, int curID){
-
+  int size1 = size;
+  size = size*2;
+  for(int i = 0; i < curID; i++){ 
+    if(i < size1){
+      ntable[(i%size)] = htable[(i)%size1];
+    }
+    else if(i < size1*2){
+      ntable[(i%size)] = htable[(i)%size1]->next;
+    }
+    else{
+      ntable[i%size]->next = htable[(i)%size1]->next->next;
+    }
+    if(i > size1){
+      ntable[(i%size)]->next = NULL;
+    }
+  }
+  print(ntable, size);
   return ntable;
 }
 void print(Student* htable[], int size){
@@ -106,7 +122,7 @@ void print(Student* htable[], int size){
 }
 void printChain(Student* current){
   if(current != NULL){
-    cout << current->firstName << " " << current->lastName << endl;
+    cout << current->firstName << " " << current->lastName << " GPA: " << fixed << setprecision(2) << current->gpa << " " << current->id << endl;
     printChain(current->next);
   }
   return;
@@ -136,13 +152,13 @@ int main(){
   if (strcmp(input, "ADD") == 0){
     addStu(htable, curID, size);
   } else if (strcmp(input, "DELETE") == 0){
-
+    dlt(htable);
   } else if (strcmp(input, "PRINT") == 0){
     print(htable, size);
   } else if(strcmp(input, "QUIT") == 0) {
     running = false;
   }else {
-    cout << "You can only ADD, DELETE, PRINT, or QUIT" << endl;
+   
   }
   }
   return 0;
