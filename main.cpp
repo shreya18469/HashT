@@ -30,7 +30,7 @@ Student** rehash(Student** htable, Student** ntable, int &size, int curID);
 Student** addStu(Student** htable, int &curID, int &size) {  
   int students;
   cout << "How many students are you adding?" << endl;
-  cin >> students;
+  cin >> students; 
   for(int i = 0; i < students; i++){
     char input[100];
     char firstName[100];
@@ -92,8 +92,8 @@ Student** addStu(Student** htable, int &curID, int &size) {
   }
   curID++;
 }
-
 return htable;
+  
 }
 Student** mAdd(Student** htable, int &curID, int &size){
   char input[100];
@@ -171,8 +171,18 @@ void printChain(Student* current){
 void dlt(Student** htable, int size){
   int i;
   cout << "What is the student's ID?" << endl;
-  
+  cin >> i;
+  cin.clear();
+  if (htable[i%size]->id == i){
+    htable[i%size] = htable[i%size]->next;
+  } else if (htable[i%size]->next->id == i){
+    htable[i%size]->next = htable[i%size]->next->next;
+  } else if (htable[i%size]->next->next->id == i){
+    htable[i%size]->next->next = NULL;
+  }
+  return;
 }
+
 void reset(Student** htable, int size){
   for(int i = 0; i < size; i++){
     htable[i] = NULL;
@@ -187,7 +197,7 @@ int main(){
   int size = 100;
   reset(htable, size);
   while(running == true){                                                                                                           
-  cout << "Enter a command(ADD, MADD, DELETE, PRINT, or QUIT)" << endl;
+  cout << "Enter a command(ADD (Name Randomizer), MADD (Manually), DELETE, PRINT, or QUIT)" << endl;
   cin >> input;
   for (int i = 0; i < 10; i++){ // convert input to uppercase                                                                                   
     input[i] =  toupper(input[i]);
@@ -198,6 +208,7 @@ int main(){
     htable = mAdd(htable, curID, size);
     }else if (strcmp(input, "DELETE") == 0){
     dlt(htable, size);
+    cout << "Deleted." << endl;
   } else if (strcmp(input, "PRINT") == 0){
     printAll(htable, size);
   } else if(strcmp(input, "QUIT") == 0) {
